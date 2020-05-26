@@ -1,6 +1,11 @@
 {
-    "url": "amqp://broker1:broker1@localhost:10001/%2F",
-    "queuesEndpoint": "http://localhost:10003/api/queues",
-    "username":"broker1",
-    "password":"broker1"
+    "masterBroker": true,
+    "masterUrl": "amqp://broker1:broker1@localhost:10001/%2F",
+    "masterQueues": "http://localhost:10003/api/queues",
+    "masterUsername": "broker1",
+    "masterPassword": "broker1",
+    "slaveUrl":"amqp://broker1:broker1@localhost:10011/%2F",
+    "slaveQueues": "http://localhost:10013/api/queues",
+    "slaveUsername":"broker1",
+    "slavePassword":"broker1"
 }

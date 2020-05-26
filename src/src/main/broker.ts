@@ -1,24 +1,39 @@
 import amqplib from 'amqplib';
-import axios from 'axios';
 import cfg from './../../broker-config.json';
-import { processFromMaster } from '../core/master-queue-process';
+import { queryQueues, processFromMaster, connectToBroker } from '../core';
 
 async function connect() {
 
-    const conn = await amqplib.connect(cfg.url);
-    const channel: amqplib.Channel = await conn.createChannel();
-    const queues_response = await axios.get(cfg.queuesEndpoint, {
-        auth: { username: cfg.username, password: cfg.password }
-    });
-    const queues = queues_response.data.map((element: any) => element.name);
+    if (cfg.masterBroker) {
+        await connectAsMaster();
+    } else {
+        await connectAsSlave();
+    }
 
-    await processFromMaster(channel, queues);
-
-    //channel.sendToQueue(queues[0], new Buffer("1234"));
-
-    // this will close the queue
+    // this will close the connections and the listeners
     // channel.close();
     // conn.close();
+}
+
+async function connectAsMaster() {
+    const conn = await amqplib.connect(cfg.masterUrl);
+    const channel: amqplib.Channel = await conn.createChannel();
+
+    const queues = await queryQueues(cfg.masterQueues, cfg.masterUsername, cfg.masterPassword);
+
+    await processFromMaster(channel, queues);
+}
+
+async function connectAsSlave() {
+    const masterConn = await amqplib.connect(cfg.masterUrl);
+    const masterChannel: amqplib.Channel = await masterConn.createChannel();
+
+    const slaveConn = await amqplib.connect(cfg.masterUrl);
+    const slaveChannel: amqplib.Channel = await slaveConn.createChannel();
+
+    const queues = await queryQueues(cfg.slaveUrl, cfg.slaveUsername, cfg.slavePassword);
+
+    await connectToBroker(slaveChannel, masterChannel, queues);
 }
 
 connect();

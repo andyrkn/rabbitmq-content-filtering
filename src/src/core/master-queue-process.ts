@@ -19,9 +19,9 @@ export async function processFromMaster(channel: amqplib.Channel, queues: string
             const queues: string[] = queueName.split('|');
 
             for (let i = 0; i < queues.length; i++) {
-                const queueSub: IMessage<ISubField> = subStringToISub(queues[i]);
+                const subscription: IMessage<ISubField> = subStringToISub(queues[i]);
 
-                if (publicationMatchToSubscription(publication, queueSub)) {
+                if (publicationMatchToSubscription(publication, subscription)) {
                     channel.sendToQueue(queueName, message.content);
                     channel.ack(message);
                     break;
