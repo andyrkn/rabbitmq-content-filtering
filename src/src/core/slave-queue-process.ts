@@ -11,7 +11,7 @@ export async function connectToBroker(slaveChannel: amqplib.Channel, masterChann
         messageTtl: 60000,
     });
 
-    masterChannel.consume(masterQueue, (message: amqplib.ConsumeMessage | null) => {
+    await masterChannel.consume(masterQueue, (message: amqplib.ConsumeMessage | null) => {
         
         if (message === null) {
             return;

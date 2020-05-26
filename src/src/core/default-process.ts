@@ -6,6 +6,7 @@ import { publicationMatchToSubscription } from ".";
 export function publishToQueues(channelToSend: amqplib.Channel, channelToAck: amqplib.Channel, queues: string[], message: amqplib.ConsumeMessage): void {
     const publication: IMessage<IPubField> = pubStringtoPub(message.content.toString());
 
+    let ack: boolean = false;
     queues.forEach((queueName: string) => {
         const queues: string[] = queueName.split('|');
 
@@ -14,9 +15,13 @@ export function publishToQueues(channelToSend: amqplib.Channel, channelToAck: am
 
             if (publicationMatchToSubscription(publication, subscription)) {
                 channelToSend.sendToQueue(queueName, message.content);
-                channelToAck.ack(message);
+                ack = true;
                 break;
             }
         }
     });
+
+    if(ack){
+        channelToAck.ack(message);
+    }
 }

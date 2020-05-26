@@ -1,7 +1,7 @@
 import amqplib from 'amqplib';
 import cfg from './../../broker-config.json';
 import { queryQueues, processFromMaster, connectToBroker } from '../core';
-
+/*
 async function connect() {
 
     if (cfg.masterBroker) {
@@ -14,8 +14,9 @@ async function connect() {
     // channel.close();
     // conn.close();
 }
+*/
 
-async function connectAsMaster() {
+export async function connectAsMaster() {
     const conn = await amqplib.connect(cfg.masterUrl);
     const channel: amqplib.Channel = await conn.createChannel();
 
@@ -24,16 +25,14 @@ async function connectAsMaster() {
     await processFromMaster(channel, queues);
 }
 
-async function connectAsSlave() {
+export async function connectAsSlave() {
     const masterConn = await amqplib.connect(cfg.masterUrl);
     const masterChannel: amqplib.Channel = await masterConn.createChannel();
 
-    const slaveConn = await amqplib.connect(cfg.masterUrl);
+    const slaveConn = await amqplib.connect(cfg.slaveUrl);
     const slaveChannel: amqplib.Channel = await slaveConn.createChannel();
 
-    const queues = await queryQueues(cfg.slaveUrl, cfg.slaveUsername, cfg.slavePassword);
+    const queues = await queryQueues(cfg.slaveQueues, cfg.slaveUsername, cfg.slavePassword);
 
-    await connectToBroker(slaveChannel, masterChannel, queues);
+    connectToBroker(slaveChannel, masterChannel, queues);
 }
-
-connect();
