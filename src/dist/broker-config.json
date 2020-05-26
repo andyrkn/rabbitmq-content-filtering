@@ -1,0 +1,6 @@
+{
+    "url": "amqp://broker1:broker1@localhost:10001/%2F",
+    "queuesEndpoint": "http://localhost:10003/api/queues",
+    "username": "broker1",
+    "password": "broker1"
+}

@@ -1,0 +1,29 @@
+[ {shovels, [ {sub-shovel,
+                    [ {sources,
+                        [ {brokers, [ "amqp://broker1:broker1@rabbitmq.broker1/%2F" ]}
+                        , {declarations, [ {'exchange.declare',
+                                              [ {exchange, <<"master_exchange">>}
+                                              , {type, <<"direct">>}
+                                              , durable ]
+                                           }
+                                         ]}
+                        ]}
+                    , {destinations,
+                        [ {broker, "amqp://"}
+                        , {declarations, [ {'queue.declare',
+                                            [{arguments, 
+                                                [{<<"sub-queue">>, long, 60000}]}]
+                                        }]
+                          }
+                        ]}
+                    , {queue, <<>>}
+                    , {prefetch_count, 100}
+                    , {ack_mode, on_confirm}
+                    , {publish_properties, [ {delivery_mode, 2} ]}
+                    , {publish_fields, [ {queue, <<"sub_queue">>}
+                                       , {routing_key, <<"broker2">>}
+                                       ]}
+                    , {reconnect_delay, 5}
+                    ]}
+                ]}
+    ]}
