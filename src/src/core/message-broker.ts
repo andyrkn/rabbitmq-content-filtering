@@ -3,15 +3,13 @@ import { IActiveSubscription, IQueueSubscription, IMessage, IPubField } from '..
 import { subStringToISub, pubStringtoPub } from '../model-converter';
 import { publicationMatchToSubscription } from './matcher';
 import { SUBSCRIPTIONQUEUE } from './statics';
+import { createQueue } from './create-queue';
 
 export class MessageBroker {
     private readonly activeSubscriptions: IActiveSubscription[] = new Array<IActiveSubscription>();
 
     constructor(private readonly channel: amqpLib.Channel) {
-
-        channel.addListener("consumer.deleted", (...args) => {
-            console.log(args);
-        })
+        this.subscribeToQueueDeletions();
     }
 
     public async listenToSubscriptions(): Promise<void> {
@@ -84,7 +82,26 @@ export class MessageBroker {
                 subscriptions: [subStringToISub(subscriptionMessage.subscription)]
             });
         }
+    }
 
-        console.log(`My updated routing table is: ${JSON.stringify(this.activeSubscriptions)}`)
+    private async subscribeToQueueDeletions(): Promise<void> {
+
+        await createQueue(this.channel, "events");
+        await this.channel.bindQueue("events", "amq.rabbitmq.event", "queue.deleted");
+
+        await this.channel.consume("events", (message: amqpLib.ConsumeMessage | null) => {
+            if (!message) {
+                return;
+            }
+            this.channel.ack(message);
+            const queueName: string = message.properties.headers.name;
+
+            const index = this.activeSubscriptions.findIndex(sub => sub.replyTo === queueName);
+            if (index === -1) {
+                return;
+            }
+
+            this.activeSubscriptions.splice(index, 1);
+        });
     }
 }

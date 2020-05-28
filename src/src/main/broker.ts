@@ -2,20 +2,6 @@ import amqplib from 'amqplib';
 import cfg from './../../broker-config.json';
 import { MessageBroker, createQueue } from '../core';
 import { v4 as uuid } from 'uuid';
-/*
-async function connect() {
-
-    if (cfg.masterBroker) {
-        await connectAsMaster();
-    } else {
-        await connectAsSlave();
-    }
-
-    // this will close the connections and the listeners
-    // channel.close();
-    // conn.close();
-}
-*/
 
 export async function connectAsMaster() {
     const conn = await amqplib.connect(cfg.masterUrl);
