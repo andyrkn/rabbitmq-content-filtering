@@ -1,0 +1,1 @@
+export const SUBSCRIPTIONQUEUE =  "consumer-subscriptions";

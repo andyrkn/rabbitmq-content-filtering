@@ -1,6 +1,7 @@
 import amqplib from 'amqplib';
 import cfg from './../../broker-config.json';
-import { queryQueues, processFromMaster, connectToBroker } from '../core';
+import { MessageBroker, createQueue } from '../core';
+import { v4 as uuid } from 'uuid';
 /*
 async function connect() {
 
@@ -20,9 +21,10 @@ export async function connectAsMaster() {
     const conn = await amqplib.connect(cfg.masterUrl);
     const channel: amqplib.Channel = await conn.createChannel();
 
-    const queues = await queryQueues(cfg.masterQueues, cfg.masterUsername, cfg.masterPassword);
+    const broker: MessageBroker = new MessageBroker(channel);
 
-    await processFromMaster(channel, queues);
+    await broker.listenToSubscriptions();
+    await broker.routePublications(channel, "master");
 }
 
 export async function connectAsSlave() {
@@ -32,7 +34,12 @@ export async function connectAsSlave() {
     const slaveConn = await amqplib.connect(cfg.slaveUrl);
     const slaveChannel: amqplib.Channel = await slaveConn.createChannel();
 
-    const queues = await queryQueues(cfg.slaveQueues, cfg.slaveUsername, cfg.slavePassword);
+    const broker: MessageBroker = new MessageBroker(slaveChannel);
 
-    connectToBroker(slaveChannel, masterChannel, queues);
+
+    const publicationsQueue: string = uuid();
+    await createQueue(masterChannel, publicationsQueue);
+
+    await broker.listenToSubscriptionsAsASlave(masterChannel, publicationsQueue);
+    await broker.routePublications(masterChannel, publicationsQueue);
 }

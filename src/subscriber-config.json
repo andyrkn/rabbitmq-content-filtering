@@ -1,0 +1,10 @@
+{
+    "url": "amqp://broker1:broker1@localhost:10011/%2F",
+    "brokerUsername": "broker1",
+    "brokerPassword": "broker1",
+    "subscriptions":[
+        "{(speed,>,80)}",
+        "{(car,=,Roxana)}",
+        "{(city,=,Iasi)}"
+    ]
+}
