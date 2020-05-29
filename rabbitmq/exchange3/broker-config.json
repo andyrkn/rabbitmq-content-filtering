@@ -1,0 +1,8 @@
+{
+    "masterUrl": "amqp://broker1:broker1@rabbitmq.broker1/%2F",
+    "masterUsername": "broker2",
+    "masterPassword": "broker2",
+    "slaveUrl":"amqp://broker1:broker1@rabbitmq.broker3/%2F",
+    "slaveUsername":"host-exchange",
+    "slavePassword":"host-exchange"
+}
