@@ -1,5 +1,5 @@
 import amqpLib from 'amqplib';
-import { IActiveSubscription, IQueueSubscription, IMessage, IPubField } from '../models';
+import { IActiveSubscription, IQueueSubscription, IMessage, IPubField, IStatistic } from '../models';
 import { subStringToISub, pubStringtoPub } from '../model-converter';
 import { publicationMatchToSubscription } from './matcher';
 import { SUBSCRIPTIONQUEUE } from './statics';
@@ -38,7 +38,7 @@ export class MessageBroker {
                 subscription: subscriptionMessage.subscription
             }
 
-            masterChannel.sendToQueue(SUBSCRIPTIONQUEUE, new Buffer(JSON.stringify(brokerSubscription)));
+            masterChannel.sendToQueue(SUBSCRIPTIONQUEUE, Buffer.from(JSON.stringify(brokerSubscription)));
         });
     }
 
@@ -55,7 +55,6 @@ export class MessageBroker {
             this.activeSubscriptions.forEach((activeSub: IActiveSubscription) => {
                 for (let i = 0; i < activeSub.subscriptions.length; i++) {
                     if (publicationMatchToSubscription(pub, activeSub.subscriptions[i])) {
-                        console.log(`Routing from ${publicationQueue} message ${message.content.toString()} to ${activeSub.replyTo}`)
                         this.channel.sendToQueue(activeSub.replyTo, message.content);
                         ack = true;
                         break;
@@ -82,6 +81,7 @@ export class MessageBroker {
                 subscriptions: [subStringToISub(subscriptionMessage.subscription)]
             });
         }
+        this.logActiveSubscriptions();
     }
 
     private async subscribeToQueueDeletions(): Promise<void> {
@@ -102,6 +102,16 @@ export class MessageBroker {
             }
 
             this.activeSubscriptions.splice(index, 1);
+            this.logActiveSubscriptions();
         });
+    }
+
+    private logActiveSubscriptions(): void {
+        const stats: IStatistic[] = this.activeSubscriptions.map(activeSub => {
+            const stat: IStatistic = { consumer: activeSub.replyTo, subscriptions: activeSub.subscriptions.length };
+            return stat;
+        });
+
+        console.log("Active Subscriptions: ",JSON.stringify(stats));
     }
 }

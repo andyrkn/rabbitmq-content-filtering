@@ -19,7 +19,7 @@ export async function subscribeToBroker() {
             subscription: sub
         };
 
-        channel.sendToQueue(SUBSCRIPTIONQUEUE, new Buffer(JSON.stringify(subscription)));
+        channel.sendToQueue(SUBSCRIPTIONQUEUE, Buffer.from(JSON.stringify(subscription)));
     });
 
     await channel.consume(queueName, (message: amqplib.ConsumeMessage | null) => {
