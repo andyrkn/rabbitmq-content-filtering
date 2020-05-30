@@ -30,17 +30,14 @@ export async function subscribeToBroker() {
 
         const date = new Date();
         
-        const elemToAppend = {
+        const subscription = {
             pub: message.content.toString(),
             time: date,
         }
 
-        fs.appendFile('file.txt', JSON.stringify(elemToAppend),  function(err: any) {
-            if (err) {
-                return console.error(err);
-            }
-            console.log("File created/appended!");
-        });
+        const elemToAppend = "\"".concat(JSON.stringify(subscription)).concat("\",\n");
+
+        fs.appendFile('subs.txt', JSON.stringify(elemToAppend));
         channel.ack(message);
     });
 }
