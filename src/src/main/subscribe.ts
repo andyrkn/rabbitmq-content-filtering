@@ -3,7 +3,7 @@ import cfg from './../../subscriber-config.json';
 import { v4 as uuid } from 'uuid';
 import { createQueue, SUBSCRIPTIONQUEUE } from '../core';
 import { IQueueSubscription } from '../models';
-let fs = require('fs');
+import fs from 'fs';
 
 export async function subscribeToBroker() {
     const conn = await amqplib.connect(cfg.url);
@@ -23,21 +23,20 @@ export async function subscribeToBroker() {
         channel.sendToQueue(SUBSCRIPTIONQUEUE, Buffer.from(JSON.stringify(subscription)));
     });
 
-    await channel.consume(queueName, (message: amqplib.ConsumeMessage | null) => {
+    await channel.consume(queueName, async (message: amqplib.ConsumeMessage | null) => {
         if (!message) {
             return;
         };
 
         const date = new Date();
-        
+
         const subscription = {
             pub: message.content.toString(),
             time: date,
         }
 
-        const elemToAppend = "\"".concat(JSON.stringify(subscription)).concat("\",\n");
-
-        fs.appendFile('subs.txt', JSON.stringify(elemToAppend));
+        const elemToAppend = `\"${JSON.stringify(subscription)}\"\n`;
+        await fs.appendFile('subs.txt', elemToAppend, () => { });
         channel.ack(message);
     });
 }

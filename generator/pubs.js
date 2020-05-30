@@ -9,16 +9,16 @@ let getRandTime = () => times[getRand(8)];
 
 let getPublication = () => {
   let values = [`(city,${getRandCity()})`,`(car,${getRandCar()})`,`(speed,${getRand(300)})`,`(time,${getRandTime()})`];
-  let arrayToReturn = '{';
+  let arrayToReturn = '"{';
 
   for (let i = 0; i < values.length; i++) {
     arrayToReturn = arrayToReturn.concat(`${values[i]},`);
   }
 
-  arrayToReturn = arrayToReturn.replace(/.$/,"}");
+  arrayToReturn = arrayToReturn.replace(/.$/,"}\",");
   return arrayToReturn;
 }
 
-for (let index = 0; index < 10000; index++) {
+for (let index = 0; index < 200000; index++) {
   console.log(getPublication());
 }
