@@ -1,0 +1,10 @@
+{
+    "url": "amqp://broker1:broker1@localhost:10001/%2F",
+    "brokerUsername": "broker1",
+    "brokerPassword": "broker1",
+    "publications": [
+        "{(city,Tampa),(car,Audi),(speed,63),(time,1430611200)}",
+        "{(city,Heraklion),(car,Toyota),(speed,11),(time,934156800)}",
+        "{(city,Edinburgh),(car,Toyota),(speed,145),(time,1543622400)}"
+    ]
+}

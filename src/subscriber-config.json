@@ -4,7 +4,6 @@
     "brokerPassword": "broker1",
     "subscriptions":[
         "{(speed,>,80)}",
-        "{(car,=,Roxana)}",
-        "{(city,=,Iasi)}"
+        "{(car,=,Toyota)}"
     ]
 }

@@ -10,26 +10,41 @@ let getRandCar = () => cars[getRand(8)];
 let getRandCity = () => cities[getRand(8)];
 let getRandTime = () => times[getRand(8)];
 let getRandComparison = () => comparisons[getRand(6)];
+const getDeletedIndex = (rand, wArray) => {
+  if (rand < 1 - wArray[0] - wArray[1] - wArray[2]) {
+    return 3;
+  }
+  if (rand < 1 - wArray[0] - wArray[1]) {
+    return 2;
+  }
+  if (rand < 1 - wArray[0]) {
+    return 1;
+  }
+  return 0;
+}
 
-let getSubscription = () => {
-  let values = [`(city,=,${getRandCity()})`,`(car,=,${getRandCar()})`,`(speed,${getRandComparison()},${getRand(300)})`,`(time,=,${getRandTime()})`];
+let getSubscription = (x, wArray) => {
 
-  let toRemove = getRand(3);
-  for (let i = 0; i <= toRemove; i++) {
-    if (values.length > 1) {
-      values.splice(getRand(4), 1);
+  for (let index = 0; index < x; index++) {
+    let values = [`(city,=,${getRandCity()})`,`(car,=,${getRandCar()})`,`(speed,${getRandComparison()},${getRand(300)})`,`(time,=,${getRandTime()})`];
+
+    let toRemove = getRand(3);
+    for (let i = 0; i <= toRemove; i++) {
+      const rand = Math.random();
+      if (values.length > 1) {
+        values.splice(getDeletedIndex(rand, wArray), 1);
+      }
     }
+
+    let arrayToReturn = '"{';
+    for (let i = 0; i < values.length; i++) {
+      arrayToReturn = arrayToReturn.concat(`${values[i]},`);
+    }
+
+    arrayToReturn = arrayToReturn.replace(/.$/,"}\",");
+    console.log(arrayToReturn);
   }
 
-  let arrayToReturn = '{';
-  for (let i = 0; i < values.length; i++) {
-    arrayToReturn = arrayToReturn.concat(`${values[i]},`);
-  }
-
-  arrayToReturn = arrayToReturn.replace(/.$/,"}");
-  return arrayToReturn;
 }
 
-for (let index = 0; index < 10000; index++) {
-  console.log(getSubscription());
-}
+getSubscription(1000, [0.7, 0.1, 0.10, 0.10]);

@@ -3,6 +3,7 @@ import cfg from './../../subscriber-config.json';
 import { v4 as uuid } from 'uuid';
 import { createQueue, SUBSCRIPTIONQUEUE } from '../core';
 import { IQueueSubscription } from '../models';
+let fs = require('fs');
 
 export async function subscribeToBroker() {
     const conn = await amqplib.connect(cfg.url);
@@ -10,7 +11,7 @@ export async function subscribeToBroker() {
 
     const queueName: string = uuid();
 
-    createQueue(channel, queueName)
+    createQueue(channel, queueName);
 
     cfg.subscriptions.forEach((sub: string) => {
 
@@ -27,7 +28,19 @@ export async function subscribeToBroker() {
             return;
         };
 
-        console.log(message.content.toString());
+        const date = new Date();
+        
+        const elemToAppend = {
+            pub: message.content.toString(),
+            time: date,
+        }
+
+        fs.appendFile('file.txt', JSON.stringify(elemToAppend),  function(err: any) {
+            if (err) {
+                return console.error(err);
+            }
+            console.log("File created/appended!");
+        });
         channel.ack(message);
     });
 }
