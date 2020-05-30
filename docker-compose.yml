@@ -3,7 +3,7 @@ version: '3.3'
 services:
   rabbitmq.broker1:
     build:
-      context: rabbitmq/master-broker/
+      context: rabbitmq/broker1/
       dockerfile: Dockerfile
     ports:
       - '10000:4369'
@@ -12,7 +12,7 @@ services:
       - '10003:15672'
   rabbitmq.broker2:
     build:
-      context: rabbitmq/slave-broker1/
+      context: rabbitmq/broker2/
       dockerfile: Dockerfile
     ports:
       - '10010:4369'
@@ -21,10 +21,28 @@ services:
       - '10013:15672'
   rabbitmq.broker3:
     build:
-      context: rabbitmq/slave-broker1/
+      context: rabbitmq/broker3/
       dockerfile: Dockerfile
     ports:
       - '10020:4369'
       - '10021:5672'
       - '10022:25672'
       - '10023:15672'
+  rabbitmq.exchange1:
+    build:
+      context: .
+      dockerfile: rabbitmq/exchange1/Dockerfile
+    depends_on:
+      - "rabbitmq.broker1"
+  rabbitmq.exchange2:
+    build:
+      context: .
+      dockerfile: rabbitmq/exchange2/Dockerfile
+    depends_on:
+      - "rabbitmq.broker2"
+  rabbitmq.exchange3:
+    build:
+      context: .
+      dockerfile: rabbitmq/exchange3/Dockerfile
+    depends_on:
+      - "rabbitmq.broker3"
